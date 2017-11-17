@@ -2,7 +2,7 @@
 require_once "signature.php";
 $jssdk = new JSSDK();
 $signPackage = $jssdk->getSignPackage();
-var_dump($signPackage["url"]);
+//var_dump($signPackage["ticket"]);
 ?>
 
 <!DOCTYPE html>
@@ -27,7 +27,7 @@ var_dump($signPackage["url"]);
         wx.ready(function(){
             wx.onMenuShareTimeline({
                 title: '课程表', // 分享标题
-                link: "http://bingyan.net/courseTable.php", //享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                link: "http://lwl.bingyan.net/courseTable.php", //享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
                 imgUrl: '', // 分享图标
                 success: function () { 
         // 用户确认分享后执行的回调函数

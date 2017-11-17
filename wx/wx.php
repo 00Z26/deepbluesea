@@ -1,11 +1,17 @@
 <?php
+		$config = require('config.php');
+		require_once "access_token.php";
+		$access = new GETTOKEN();
+		$access_token = $access->getToken();
+		//var_dump($access_token);
+		//var_dump($config);
 		//定义常量
-		define(AppId,"wx79705a463101cc82");
-		define(AppSecret, "20fd20139a403efa40adf86c31fe7974");
-		define(access_token, "SnHmIZOYj6zu-h8LxixuhLdAEnm_TPOKA4zPRcqxyGXuMrI3eU7UWupmNbVSzsT3qoFjpEwlYvK23vwjo36qGgyLKcxVj4_4cV0LtyPspz6vFW0Z-5TWlaNW5cRCf7L4DDGiABARRU");
+		//define(AppId,"wx79705a463101cc82");
+		//define(AppSecret, "20fd20139a403efa40adf86c31fe7974");
+		//define(access_token, "SnHmIZOYj6zu-h8LxixuhLdAEnm_TPOKA4zPRcqxyGXuMrI3eU7UWupmNbVSzsT3qoFjpEwlYvK23vwjo36qGgyLKcxVj4_4cV0LtyPspz6vFW0Z-5TWlaNW5cRCf7L4DDGiABARRU");
 
 		//回复文本消息
-		function reponseMsg(){
+		function reponseMsg($config){
 		$postArr = file_get_contents("php://input");
 		//var_dump ($postArr);
 		$postObj = simplexml_load_string($postArr);
@@ -25,7 +31,8 @@
 				//$fromUser = $postObj->ToUserName;
 				$time = time();
 				$msgType = 'text';
-				$content = '我等你好久了。';
+				$content = $config['welcomeWord'];
+				//var_dump($content);
 				$template = "<xml>
 						<ToUserName><![CDATA[%s]]></ToUserName>
 						<FromUserName><![CDATA[%s]]></FromUserName>
@@ -42,7 +49,7 @@
 		if($postObj->MsgType == 'text'){
 				$time = time();
 				$msgType = 'text';
-				$content = '我听着呢';
+				$content = $config['responseWord'];
 				$template = "<xml>
 						<ToUserName><![CDATA[%s]]></ToUserName>
 						<FromUserName><![CDATA[%s]]></FromUserName>
@@ -70,7 +77,7 @@
 		}
 	}
 
-	function createMenu(){
+	function createMenu($config,$access_token){
 		$menuData = '{  
         "button":[
              {  
@@ -84,14 +91,14 @@
                     {
                        "type":"view",
                        "name":"自定义分享",
-                       "url":"http://bingyan.net/courseTable.php"
+                       "url":"http://lwl.bingyan.net/courseTable.php"
                     },
                 	]
               }]
          }';
 
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=".access_token);
+        curl_setopt($ch, CURLOPT_URL, "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=$access_token");
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
@@ -110,7 +117,8 @@
 
 		//获得参数 signature nonce token timestamp echostr
 		$nonce     = $_GET['nonce'];
-		$token     = 'lwl620';
+		$token     = $config['firstToken'];
+		//var_dump($token);
 		$timestamp = $_GET['timestamp'];
 		$echostr   = $_GET['echostr'];
 		$signature = $_GET['signature'];
@@ -121,13 +129,13 @@
 		//拼接成字符串,sha1加密 ，然后与signature进行校验
 		$str = sha1( implode( $array ) );
 		//生成菜单栏
-		createMenu();
+		createMenu($config,$access_token);
 		if( $str == $signature && $echostr ){
 			//第一次接入weixin api接口的时候
 			echo  $echostr;
 			exit;
 		} else {
-			reponseMsg();
+			reponseMsg($config);
 		}
 
 
